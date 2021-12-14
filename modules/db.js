@@ -39,10 +39,10 @@ const generateId = () => {
 
 const checkActivityLog = (activityLog) => {
     let keyFlag = Object.keys(activityLog).every((item) => logKeys.includes(item));
-    
+
     if (keyFlag) {
         let valueFlag = Object.values(activityLog).every((item) => typeValues.includes(item));
-        
+
         if (logKeys) {
             return activityLog
         } else {
@@ -67,7 +67,7 @@ const createUser = (user, done) => {
     let newActivity = new ActivityModel(acivityEntry);
 
     newActivity.save(function (err, data) {
-        if (err) return done(err);
+        if (err) return done(err, null);
         done(null, data);
     })
 };
@@ -75,15 +75,19 @@ const createUser = (user, done) => {
 // Add activity: function(need user_id)
 const addActivityArray = (id, activityJSON, done) => {
     ActivityModel.findOneAndUpdate(
-        {_id: id},
-        {$push: {log: activityJSON}},
+        { _id: id },
+        { $push: { log: activityJSON } },
+        {new: true},
         function (err, data) {
-            if (err) return done(err);
-            console.log(`Push activity: ${data['log']}`);
+            if (err) return done(err, null);
+            if (data == null) return done(new Error("Data is null!"), null);
+
             done(null, [...data['log'], {
-                description: activityJSON.description,
-                duration: parseInt(activityJSON.duration),
-                date: activityJSON.date
+                username: data['username'],
+                description: data['log'].slice(-1)[0]['description'],
+                duration: parseInt(data['log'].slice(-1)[0]['duration']),
+                date: data['log'].slice(-1)[0]['date'],
+                _id: data['log'].slice(-1)[0]['_id']
             }]);
         }
     )
@@ -92,7 +96,7 @@ const addActivityArray = (id, activityJSON, done) => {
 // Delete all documents
 const deleteActivityPromise = (done) => {
     ActivityModel.deleteMany({}, function (err, data) {
-        if (err) return done(err);
+        if (err) return done(err, null);
         done(null, data);
     });
 }

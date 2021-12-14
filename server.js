@@ -46,7 +46,10 @@ routerapi.post('/users', function (req, res, next) {
   addUser(req.body['username'], function (err, data) {
     clearTimeout(t);
     if (err) return next(err);
-    res.json(data);
+    res.json({
+      username: data['username'],
+      _id: data['_id']
+    });
     next();
   });
 });
@@ -54,15 +57,14 @@ routerapi.post('/users', function (req, res, next) {
 // /api/users/:_id/exercises
 const addActivity = require("./modules/db").addActivityArray;
 routerapi.post('/users/:_id/exercises', function (req, res, next) {
-  // let t = setTimeout(() => {
-  //   next({ message: "timeout" });
-  // }, TIMEOUT);
+  let t = setTimeout(() => {
+    next({ message: "timeout" });
+  }, TIMEOUT);
 
   addActivity(req.params['_id'], req.body, function (err, data) {
-    // clearTimeout(t);
-    console.log('Request body', req.body);
+    clearTimeout(t);
     if (err) return next(err);
-    res.send(data);
+    res.json(data.slice(-1)[0]);
     next();
   });
 });
@@ -74,6 +76,7 @@ routerapi.get('/deleteall', function (req, res, next) {
   }, TIMEOUT);
 
   deleteAll(function (err, data) {
+    clearTimeout(t);
     if (err) return next(err);
     res.json(data);
     next();
