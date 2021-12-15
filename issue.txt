@@ -1,0 +1,7 @@
+1. create route GET /api/users/:_id/logs?[from][&to][&limit]
+    a. req params parsing
+    b. cast from and to to date object
+    c. query with condition and pre-parsing of date field
+    d. include limit for max return from query
+    
+2. Update REST test to test all works in point 1
