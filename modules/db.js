@@ -81,12 +81,20 @@ const addActivityArray = (id, activityJSON, done) => {
         function (err, data) {
             if (err) return done(err, null);
             if (data == null) return done(new Error("Data is null!"), null);
+            
+            let reformattedDate = new Date(data['log'].slice(-1)[0]['date']);
+            
+            //This will generate ['Www', 'dd', 'Mmm', 'yyyy'] array
+            reformattedDate = reformattedDate.toUTCString().split(' ').slice(0,4);
+            //Reformat to be Www Mmm dd yyyy
+            let formattedStringDate = `${reformattedDate[0].slice(0,-1)} ${reformattedDate[2]} ${reformattedDate[1]} ${reformattedDate[3]}`;
+            console.log("Formatted string date", formattedStringDate);
 
             done(null, [...data['log'], {
                 username: data['username'],
                 description: data['log'].slice(-1)[0]['description'],
                 duration: parseInt(data['log'].slice(-1)[0]['duration']),
-                date: data['log'].slice(-1)[0]['date'],
+                date: formattedStringDate,
                 _id: data['log'].slice(-1)[0]['_id']
             }]);
         }
