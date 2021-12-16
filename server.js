@@ -74,19 +74,35 @@ routerapi.post('/users/:_id/exercises', function (req, res, next) {
 
 
 // /api/deleteAll to clean existing database
-const deleteAll = require("./modules/db").deleteActivityPromise;
+const deleteAllActivity = require("./modules/db").deleteActivityPromise;
+const deleteAllExercise = require("./modules/db").deleteExcercisePromise;
 routerapi.get('/deleteall', function (req, res, next) {
+
+  var deletedRecords = {
+    deletedUserCount: 0,
+    deletedActivityCount: 0
+  };
+
   let t = setTimeout(() => {
     next({ message: "timeout" });
   }, TIMEOUT);
 
-  deleteAll(function (err, data) {
+  deleteAllActivity(function (err, data) {
+    // clearTimeout(t);
+    if (err) return next(err);
+    deletedRecords.deletedUserCount = data;
+    next();
+  });
+
+  deleteAllExercise(function (err, data) {
     clearTimeout(t);
     if (err) return next(err);
-    res.json(data);
+    deletedRecords.deletedActivityCount = data;
     next();
-  })
+  });
 
+  res.json(deletedRecords);
+  next();
 });
 
 
