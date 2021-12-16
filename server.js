@@ -69,6 +69,11 @@ routerapi.post('/users/:_id/exercises', function (req, res, next) {
   });
 });
 
+// /api/users/:_id/logs?[from][&to][&limit]
+
+
+
+// /api/deleteAll to clean existing database
 const deleteAll = require("./modules/db").deleteActivityPromise;
 routerapi.get('/deleteall', function (req, res, next) {
   let t = setTimeout(() => {
@@ -89,4 +94,4 @@ routerapi.get('/deleteall', function (req, res, next) {
 
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port)
-})
+});
