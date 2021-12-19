@@ -2,9 +2,9 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 const cors = require('cors');
+
 const bodyParser = require('body-parser');
 const routerapi = express.Router();
-const Activity = require("./modules/db.js").ActivityModel;
 const TIMEOUT = 2000; // 2secs timeout
 
 // -------------------------------- custom middlewares --------------------------------
@@ -32,7 +32,7 @@ app.use(path = '/api', routerapi);
 
 // -------------------- REST handler and router --------------------
 // get /root
-app.get('/', (req, res) => {
+app.get('/', (req, res, next) => {
   res.sendFile(__dirname + '/views/index.html');
 });
 
@@ -73,6 +73,7 @@ routerapi.post('/users/:_id/exercises', function (req, res, next) {
 
 
 
+
 // /api/deleteAll to clean existing database
 const deleteAllActivity = require("./modules/db").deleteActivityPromise;
 const deleteAllExercise = require("./modules/db").deleteExcercisePromise;
@@ -106,8 +107,14 @@ routerapi.get('/deleteall', function (req, res, next) {
 });
 
 
+// -------------------- test --------------------
+
+
 // -------------------- end of REST handler and router --------------------
 
 const listener = app.listen(process.env.PORT || 3000, () => {
-  console.log('Your app is listening on port ' + listener.address().port)
+  console.log('Your app is listening on port ' + listener.address().port);
 });
+// -------------------- exports to test --------------------
+exports.app = app;
+exports.listener = listener;

@@ -3,17 +3,25 @@ require('dotenv').config();
 // -------------------- Database setup --------------------
 var mongoose = require('mongoose');
 const uri = process.env.MONGO_URI;
-mongoose.connect(uri, {
+
+// mongoose.connect(uri, {
+//     useUnifiedTopology: true,
+//     useNewUrlParser: true
+// });
+
+mongoose.connect("mongodb://localhost:27017/backendfour", {
     useUnifiedTopology: true,
     useNewUrlParser: true
 });
+
 
 const { Schema } = mongoose;
 
 const exerciseSchema = new Schema({
     description: String,
+    userid: String,
     duration: Number,
-    date: String
+    date: Date
 })
 
 const activitySchema = new Schema({
@@ -59,7 +67,7 @@ const checkActivityLog = (activityLog) => {
 // -------------------- End of util function --------------------
 
 //-------------------- Database function --------------------
-// Create User
+// Create User : function(username, callback)
 const createUser = (user, done) => {
     let activityEntry = {
         username: user,
@@ -76,16 +84,21 @@ const createUser = (user, done) => {
     })
 };
 
-// Add activity: function(need user_id)
+// Add activity: function(userid, activity object, callback)
 const addActivityArray = (id, activityJSON, done) => {
     checkActivityLog(activityJSON);
 
-    let newExercise = new ExerciseModel(activityJSON);
+    let newExercise = new ExerciseModel({
+        description: activityJSON.description,
+        userid: id,
+        duration: activityJSON.duration,
+        date: activityJSON.date
+    });
     newExercise.save(function (err, data) {
         if (err) return done(err, null);
         ActivityModel.findOneAndUpdate(
             { _id: id },
-            { $push: { log: newExercise } },
+            { $push: { log: newExercise }, $inc: {count: 1}},
             { new: true },
             function (err, data) {
                 if (err) return done(err, null);
@@ -95,9 +108,10 @@ const addActivityArray = (id, activityJSON, done) => {
 
                 //This will generate ['Www', 'dd', 'Mmm', 'yyyy'] array
                 reformattedDate = reformattedDate.toUTCString().split(' ').slice(0, 4);
+
                 //Reformat to be Www Mmm dd yyyy
                 let formattedStringDate = `${reformattedDate[0].slice(0, -1)} ${reformattedDate[2]} ${reformattedDate[1]} ${reformattedDate[3]}`;
-                
+
                 done(null, [...data['log'], {
                     username: data['username'],
                     description: data['log'].slice(-1)[0]['description'],
@@ -108,34 +122,14 @@ const addActivityArray = (id, activityJSON, done) => {
             }
         );
     })
-    // ExerciseModel
-    // ActivityModel.findOneAndUpdate(
-    //     { _id: id },
-    //     { $push: { log: activityJSON } },
-    //     {new: true},
-    //     function (err, data) {
-    //         if (err) return done(err, null);
-    //         if (data == null) return done(new Error("Data is null!"), null);
-
-    //         let reformattedDate = new Date(data['log'].slice(-1)[0]['date']);
-
-    //         //This will generate ['Www', 'dd', 'Mmm', 'yyyy'] array
-    //         reformattedDate = reformattedDate.toUTCString().split(' ').slice(0,4);
-    //         //Reformat to be Www Mmm dd yyyy
-    //         let formattedStringDate = `${reformattedDate[0].slice(0,-1)} ${reformattedDate[2]} ${reformattedDate[1]} ${reformattedDate[3]}`;
-
-    //         done(null, [...data['log'], {
-    //             username: data['username'],
-    //             description: data['log'].slice(-1)[0]['description'],
-    //             duration: parseInt(data['log'].slice(-1)[0]['duration']),
-    //             date: formattedStringDate,
-    //             _id: data['log'].slice(-1)[0]['_id']
-    //         }]);
-    //     }
-    // )
 };
-// Find activity with time range
-// Delete all activity documents
+
+// Find activity with time range: function(start, end, limit, userid, callback)
+const queryExerciseRange = (start, end, limit, userid, done) => {
+
+};
+
+// Delete all activity documents: function(callback)
 const deleteActivityPromise = (done) => {
     ActivityModel.deleteMany({}, function (err, data) {
         if (err) return done(err, null);
@@ -143,7 +137,7 @@ const deleteActivityPromise = (done) => {
     });
 }
 
-// Delete all exercise documents
+// Delete all exercise documents: function(callback)
 const deleteExcercisePromise = (done) => {
     ExerciseModel.deleteMany({}, function (err, data) {
         if (err) return done(err, null);
@@ -154,8 +148,9 @@ const deleteExcercisePromise = (done) => {
 //-------------------- End of Database function --------------------
 
 // -------------------- exports --------------------------------
-exports.ActivityModel = ActivityModel;
+exports.mongoose = mongoose;
 exports.createUser = createUser;
 exports.addActivityArray = addActivityArray;
+exports.queryExerciseRange = queryExerciseRange;
 exports.deleteActivityPromise = deleteActivityPromise;
 exports.deleteExcercisePromise = deleteExcercisePromise;
