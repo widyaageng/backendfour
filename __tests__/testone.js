@@ -6,15 +6,14 @@ const requestWithSupertest = supertest(server);
 
 describe('User Endpoints', () => {
 
-    it('GET / get homepage ok', async () => {
+    it('GET / server alive', async () => {
         const res = await requestWithSupertest.get('/');
         expect(res.status).toEqual(200);
-        // expect(res.type).toEqual(expect.stringContaining('json'));
-        // expect(res.body).toHaveProperty('users')
     });
 });
 
 afterAll(() => {
+    // mongooseHandler.connection.db.dropCollection('backendfour', function(req, res) {});
     mongooseHandler.disconnect();
     serverlistener.close();
 });

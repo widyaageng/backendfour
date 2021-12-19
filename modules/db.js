@@ -21,7 +21,7 @@ const exerciseSchema = new Schema({
     description: String,
     userid: String,
     duration: Number,
-    date: Date
+    date: String
 })
 
 const activitySchema = new Schema({
@@ -35,15 +35,15 @@ let ActivityModel = mongoose.model('Activity', activitySchema);
 let ExerciseModel = mongoose.model('Exercise', exerciseSchema);
 
 const logKeys = ['description', 'duration', 'date'];
-const typeValues = ['String', 'Number', 'String'];
+const typeValues = ['string', 'number', 'string'];
 // -------------------- End of Database setup --------------------
 
 // -------------------- Util function --------------------
 const generateId = () => {
     var idOut = "";
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    var possible = "0123456789abcdef";
 
-    for (var i = 0; i < 32; i++)
+    for (var i = 0; i < 24; i++)
         idOut += possible.charAt(Math.floor(Math.random() * possible.length));
 
     return idOut;
@@ -51,13 +51,23 @@ const generateId = () => {
 
 const checkActivityLog = (activityLog) => {
     let keyFlag = Object.keys(activityLog).every((item) => logKeys.includes(item));
-
+    
     if (keyFlag) {
-        let valueFlag = Object.values(activityLog).every((item) => typeValues.includes(item));
+        try {
+            activityLog['duration'] = parseInt(activityLog['duration']);
+        } catch (error) {
+            throw new Error('activityLog value duration is not valid number');
+        }
 
-        if (logKeys) {
+        let valueFlag = Object.values(activityLog).every((element, index) => {
+            console.log(`Element: ${typeof element}, typeExpected: ${typeValues[index]}`);
+            return typeValues[index] === typeof element;
+        });
+
+        if (valueFlag) {
             return activityLog
         } else {
+            console.log(valueFlag);
             throw new Error('activityLog value type doesnt match');
         }
     } else {
@@ -86,14 +96,21 @@ const createUser = (user, done) => {
 
 // Add activity: function(userid, activity object, callback)
 const addActivityArray = (id, activityJSON, done) => {
-    checkActivityLog(activityJSON);
+    try {
+        checkActivityLog(activityJSON);
+    } catch (error) {
+        done(error, null);
+    }
+
+    console.log(activityJSON);
 
     let newExercise = new ExerciseModel({
         description: activityJSON.description,
-        userid: id,
+        userid: activityJSON.userid,
         duration: activityJSON.duration,
         date: activityJSON.date
     });
+    
     newExercise.save(function (err, data) {
         if (err) return done(err, null);
         ActivityModel.findOneAndUpdate(
@@ -149,6 +166,9 @@ const deleteExcercisePromise = (done) => {
 
 // -------------------- exports --------------------------------
 exports.mongoose = mongoose;
+exports.ActivityModel = ActivityModel;
+exports.ExerciseModel = ExerciseModel;
+exports.generateId = generateId;
 exports.createUser = createUser;
 exports.addActivityArray = addActivityArray;
 exports.queryExerciseRange = queryExerciseRange;

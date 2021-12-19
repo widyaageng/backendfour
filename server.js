@@ -7,19 +7,19 @@ const bodyParser = require('body-parser');
 const routerapi = express.Router();
 const TIMEOUT = 2000; // 2secs timeout
 
-// -------------------------------- custom middlewares --------------------------------
+// ---------------- custom middlewares ----------------
 //app logger
 function appLogger(req, res, next) {
   console.log(`${req.method} ${req.path} - ${req.ip}`);
   next();
 }
 
-// -------------------------------- end of custom middlewares --------------------------------
-
+// ---------------- end of custom middlewares ----------------
 // -------------------- utility methods --------------------
 
-// -------------------- end of utility methods --------------------
 
+
+// -------------------- end of utility methods --------------------
 // -------------------- apply middlewares --------------------
 app.use(cors());
 app.use(express.static('public'));
@@ -28,8 +28,6 @@ app.use(path = '/', middleWareFunction = bodyParser.urlencoded({ extended: true 
 app.use(path = '/', middlewareFunction = bodyParser.json());
 app.use(path = '/api', routerapi);
 // -------------------- end of apply middlewares --------------------
-
-
 // -------------------- REST handler and router --------------------
 // get /root
 app.get('/', (req, res, next) => {
@@ -72,8 +70,6 @@ routerapi.post('/users/:_id/exercises', function (req, res, next) {
 // /api/users/:_id/logs?[from][&to][&limit]
 
 
-
-
 // /api/deleteAll to clean existing database
 const deleteAllActivity = require("./modules/db").deleteActivityPromise;
 const deleteAllExercise = require("./modules/db").deleteExcercisePromise;
@@ -89,7 +85,6 @@ routerapi.get('/deleteall', function (req, res, next) {
   }, TIMEOUT);
 
   deleteAllActivity(function (err, data) {
-    // clearTimeout(t);
     if (err) return next(err);
     deletedRecords.deletedUserCount = data;
     next();
@@ -106,8 +101,8 @@ routerapi.get('/deleteall', function (req, res, next) {
   next();
 });
 
-
 // -------------------- test --------------------
+
 
 
 // -------------------- end of REST handler and router --------------------
@@ -115,6 +110,7 @@ routerapi.get('/deleteall', function (req, res, next) {
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port);
 });
+
 // -------------------- exports to test --------------------
 exports.app = app;
 exports.listener = listener;
