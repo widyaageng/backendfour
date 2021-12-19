@@ -60,7 +60,6 @@ const checkActivityLog = (activityLog) => {
         }
 
         let valueFlag = Object.values(activityLog).every((element, index) => {
-            console.log(`Element: ${typeof element}, typeExpected: ${typeValues[index]}`);
             return typeValues[index] === typeof element;
         });
 
@@ -102,11 +101,9 @@ const addActivityArray = (id, activityJSON, done) => {
         done(error, null);
     }
 
-    console.log(activityJSON);
-
     let newExercise = new ExerciseModel({
         description: activityJSON.description,
-        userid: activityJSON.userid,
+        userid: id,
         duration: activityJSON.duration,
         date: activityJSON.date
     });

@@ -49,43 +49,30 @@ describe('User Endpoints', () => {
             const exerciseEntries = [
                 {
                     description: 'Eat',
-                    userid: testUserId,
                     duration: 20,
-                    date: new Date('2021-12-17')
+                    date: '2021-12-17'
                 },
                 {
                     description: 'Work',
-                    userid: testUserId,
                     duration: 480,
-                    date: new Date('2021-12-18')
+                    date: '2021-12-18'
                 },
                 {
                     description: 'Code',
-                    userid: testUserId,
                     duration: 600,
-                    date: new Date('2021-12-19')
+                    date: '2021-12-19'
                 }
             ]
 
             // create exercises
-            // exerciseEntries.forEach(async function (item) {
-            //     await requestWithSupertest.post(`/api/${testUserId}/exercises`)
-            //         .send(item);
-            // })
-
-            await requestWithSupertest.post(`/api/users/${testUserId}/exercises`)
-                .send(exerciseEntries[0]);
-
-            // await requestWithSupertest.post(`/api/users/${testUserId}/exercises`)
-            //     .send(exerciseEntries[1]);
-
-            // await requestWithSupertest.post(`/api/users/${testUserId}/exercises`)
-            //     .send(exerciseEntries[2]);
+            for (const entry of exerciseEntries) {
+                await requestWithSupertest.post(`/api/users/${testUserId}/exercises`)
+                    .send(entry);
+            }
 
             // console.log(testUserId);
-            // const exerciseCount = await ExerciseModel.find({ 'userid': new mongooseHandler.Types.ObjectId(testUserId) }).count();
-            // console.log(exerciseCount);
-            // expect(exerciseCount).toEqual(exerciseEntries.length);
+            const exerciseCount = await ExerciseModel.find({ 'userid': testUserId }).count();
+            expect(exerciseCount).toEqual(exerciseEntries.length);
 
         } catch (err) {
             console.log(`Error ${err}`)
@@ -94,10 +81,10 @@ describe('User Endpoints', () => {
 
 
 
-    // it('GET /api/deleteall; Task: Delete all documents', async () => {
-    //     const res = await requestWithSupertest.get('/api/deleteall');
-    //     expect(res.status).toEqual(200);
-    // });
+    it('GET /api/deleteall; Task: Delete all documents', async () => {
+        const res = await requestWithSupertest.get('/api/deleteall');
+        expect(res.status).toEqual(200);
+    });
 });
 
 afterAll(() => {
