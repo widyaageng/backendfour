@@ -22,61 +22,67 @@ describe('User Endpoints', () => {
             log: []
         };
 
-        try {
-            // check count, post, check count
-            const count = await ActivityModel.count();
-            await requestWithSupertest.post('/api/users').send(userEntry);
 
-            const newCount = await ActivityModel.count();
-            expect(newCount).toBe(count + 1);
+        // check count, post, check count
+        const count = await ActivityModel.count();
+        await requestWithSupertest.post('/api/users').send(userEntry);
 
-            // checking the added username and get the id
-            const firstEntry = await ActivityModel.find({ 'username': 'Widya' });
-            expect(firstEntry[0]['username']).toEqual('Widya');
+        const newCount = await ActivityModel.count();
+        expect(newCount).toBe(count + 1);
 
-        } catch (err) {
-            console.log(`Error ${err}`)
-        }
+        // checking the added username and get the id
+        const firstEntry = await ActivityModel.find({ 'username': 'Widya' });
+        expect(firstEntry[0]['username']).toEqual('Widya');
+
     });
 
     it('POST /users/:_id/exercises; Task: Create new exercises', async () => {
 
-        try {
-            // get test username and get the id
-            const firstEntry = await ActivityModel.find({ 'username': 'Widya' });
-            const testUserId = firstEntry[0]['_id'];
+        // get test username and get the id
+        const firstEntry = await ActivityModel.find({ 'username': 'Widya' });
+        const testUserId = firstEntry[0]['_id'];
 
-            const exerciseEntries = [
-                {
-                    description: 'Eat',
-                    duration: 20,
-                    date: '2021-12-17'
-                },
-                {
-                    description: 'Work',
-                    duration: 480,
-                    date: '2021-12-18'
-                },
-                {
-                    description: 'Code',
-                    duration: 600,
-                    date: '2021-12-19'
-                }
-            ]
-
-            // create exercises
-            for (const entry of exerciseEntries) {
-                await requestWithSupertest.post(`/api/users/${testUserId}/exercises`)
-                    .send(entry);
+        const exerciseEntries = [
+            {
+                description: 'Eat',
+                duration: 20,
+                date: '2021-12-17'
+            },
+            {
+                description: 'Work',
+                duration: 480,
+                date: '2021-12-18'
+            },
+            {
+                description: 'Code',
+                duration: 600,
+                date: '2021-12-19'
             }
+        ]
 
-            // console.log(testUserId);
-            const exerciseCount = await ExerciseModel.find({ 'userid': testUserId }).count();
-            expect(exerciseCount).toEqual(exerciseEntries.length);
+        // create exercises
+        let resSupertest = null;
 
-        } catch (err) {
-            console.log(`Error ${err}`)
+        for (const entry of exerciseEntries) {
+            resSupertest = await requestWithSupertest.post(`/api/users/${testUserId}/exercises`)
+                .send(entry);
         }
+
+        // console.log(testUserId);
+        const exerciseCount = await ExerciseModel.find({ 'userid': testUserId }).count();
+        expect(exerciseCount).toEqual(exerciseEntries.length);
+
+        // checking format return
+        let reformattedDate = new Date(exerciseEntries.slice(-1)[0]['date']);
+        //This will generate ['Www', 'dd', 'Mmm', 'yyyy'] array
+        reformattedDate = reformattedDate.toUTCString().split(' ').slice(0, 4);
+        //Reformat to be Www Mmm dd yyyy
+        let formattedStringDate = `${reformattedDate[0].slice(0, -1)} ${reformattedDate[2]} ${reformattedDate[1]} ${reformattedDate[3]}`;
+        expect(resSupertest.body['username']).toEqual('Widya');
+        expect(resSupertest.body['description']).toEqual(exerciseEntries.slice(-1)[0]['description']);
+        expect(resSupertest.body['duration']).toEqual(exerciseEntries.slice(-1)[0]['duration']);
+        expect(resSupertest.body['date']).toEqual(formattedStringDate);
+        expect(resSupertest.body['_id']).toEqual(testUserId);
     });
 
 

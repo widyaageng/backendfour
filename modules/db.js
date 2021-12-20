@@ -34,8 +34,8 @@ const activitySchema = new Schema({
 let ActivityModel = mongoose.model('Activity', activitySchema);
 let ExerciseModel = mongoose.model('Exercise', exerciseSchema);
 
-const logKeys = [':_id','description', 'duration', 'date'];
-const typeValues = ['string', 'string', 'number', 'string'];
+const logKeys = ['description', 'duration', 'date'];
+const typeValues = ['string', 'number', 'string'];
 // -------------------- End of Database setup --------------------
 
 // -------------------- Util function --------------------

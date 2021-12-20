@@ -60,7 +60,6 @@ routerapi.post('/users/:_id/exercises', function (req, res, next) {
   }, TIMEOUT);
 
   addActivity(req.params['_id'], req.body, function (err, data) {
-    console.log(req.body);
     clearTimeout(t);
     if (err) return next(err);
     res.json(data.slice(-1)[0]);
