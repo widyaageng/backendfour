@@ -51,7 +51,7 @@ const generateId = () => {
 
 const checkActivityLog = (activityLog) => {
     let keyFlag = Object.keys(activityLog).every((item) => logKeys.includes(item));
-    
+
     if (keyFlag) {
         try {
             activityLog['duration'] = parseInt(activityLog['duration']);
@@ -107,12 +107,12 @@ const addActivityArray = (id, activityJSON, done) => {
         duration: activityJSON.duration,
         date: activityJSON.date
     });
-    
+
     newExercise.save(function (err, data) {
         if (err) return done(err, null);
         ActivityModel.findOneAndUpdate(
             { _id: id },
-            { $push: { log: newExercise }, $inc: {count: 1}},
+            { $push: { log: newExercise }, $inc: { count: 1 } },
             { new: true },
             function (err, data) {
                 if (err) return done(err, null);
@@ -139,8 +139,48 @@ const addActivityArray = (id, activityJSON, done) => {
 };
 
 // Find activity with time range: function(start, end, limit, userid, callback)
-const queryExerciseRange = (start, end, limit, userid, done) => {
+const queryExerciseRange = (urlQueries, done) => {
+    let docOut = {
+        username: '',
+        count: 0,
+        _id: urlQueries.userid,
+        log: []
+    }
 
+    ActivityModel.findById(urlQueries.userid, function (err, userdata) {
+        if (err) return done(err);
+
+        console.log(userdata);
+        docOut.username = userdata.username;
+
+        if (urlQueries.limit === 'all') {
+            ExerciseModel.find({
+                'userid': urlQueries.userid,
+                'date': {
+                    $gte: urlQueries.start,
+                    $lte: urlQueries.end
+                }
+            }, {_id:0, 'userid':0, __v:0}, function (err, data) {
+                if (err) return done(err, null);
+                docOut.count = data.length;
+                docOut.log = data;
+                done(null, docOut);
+            });
+        } else {
+            ExerciseModel.find({
+                'userid': urlQueries.userid,
+                'date': {
+                    $gte: urlQueries.start,
+                    $lte: urlQueries.end
+                }
+            }, {_id:0, 'userid':0, __v:0}, function (err, data) {
+                if (err) return done(err, null);
+                docOut.count = urlQueries.limit;
+                docOut.log = data;
+                done(null, docOut);
+            });
+        }
+    })
 };
 
 // Delete all activity documents: function(callback)

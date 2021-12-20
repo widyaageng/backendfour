@@ -68,7 +68,28 @@ routerapi.post('/users/:_id/exercises', function (req, res, next) {
 });
 
 // /api/users/:_id/logs?[from][&to][&limit]
+const queryActivity = require("./modules/db").queryExerciseRange;
+routerapi.get(/\/users\/([0-9abcdef]{24})\/logs\?*(from)*/, function(req, res, next) {
+  let t = setTimeout(() => {
+    next({ message: "timeout" });
+  }, TIMEOUT);
 
+  let urlQueries = {
+    start: req.query['from'] === undefined ? (new Date(0)).toISOString().split('T')[0]: req.query['from'],
+    end: req.query['to'] === undefined ? (new Date()).toISOString().split('T')[0]: req.query['to'],
+    limit: req.query['limit'] === undefined ? 'all': req.query['limit'],
+    userid: req.params[0]
+  }
+
+  console.log(urlQueries);
+
+  queryActivity(urlQueries, function(err, data) {
+    clearTimeout(t);
+    if (err) return next(err);
+    res.json(data);
+    next();
+  });
+});
 
 // /api/deleteAll to clean existing database
 const deleteAllActivity = require("./modules/db").deleteActivityPromise;
