@@ -13,13 +13,15 @@ function appLogger(req, res, next) {
   console.log(`${req.method} ${req.path} - ${req.ip}`);
   next();
 }
-
 // ---------------- end of custom middlewares ----------------
+
+
+
 // -------------------- utility methods --------------------
-
-
-
 // -------------------- end of utility methods --------------------
+
+
+
 // -------------------- apply middlewares --------------------
 app.use(cors());
 app.use(express.static('public'));
@@ -28,6 +30,8 @@ app.use(path = '/', middleWareFunction = bodyParser.urlencoded({ extended: true 
 app.use(path = '/', middlewareFunction = bodyParser.json());
 app.use(path = '/api', routerapi);
 // -------------------- end of apply middlewares --------------------
+
+
 // -------------------- REST handler and router --------------------
 // get /root
 app.get('/', (req, res, next) => {
@@ -75,13 +79,13 @@ routerapi.get(/\/users\/([0-9abcdef]{24})\/logs\?*(from)*/, function(req, res, n
   }, TIMEOUT);
 
   let urlQueries = {
-    start: req.query['from'] === undefined ? (new Date(0)).toISOString().split('T')[0]: req.query['from'],
-    end: req.query['to'] === undefined ? (new Date()).toISOString().split('T')[0]: req.query['to'],
-    limit: req.query['limit'] === undefined ? 'all': req.query['limit'],
+    start: req.query['from'] === undefined || req.query['from'] === '' ? (new Date(0)).toISOString().split('T')[0]: req.query['from'],
+    end: req.query['to'] === undefined || req.query['to'] === '' ? (new Date(2147483647000)).toISOString().split('T')[0]: req.query['to'],
+    limit: req.query['limit'] === undefined || req.query['limit'] === '' ? 'all': req.query['limit'],
     userid: req.params[0]
   }
 
-  console.log(urlQueries);
+  // console.log(urlQueries);
 
   queryActivity(urlQueries, function(err, data) {
     clearTimeout(t);

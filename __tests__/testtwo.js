@@ -14,8 +14,13 @@ const requestWithSupertest = supertest(server);
 
 describe('User Endpoints', () => {
 
+    it('GET /api/deleteall; Task: Delete all documents', async () => {
+        const res = await requestWithSupertest.get('/api/deleteall');
+        expect(res.status).toEqual(200);
+    });
+
     it('POST /api/users; Task: Create new user', async () => {
-        const userEntry = {
+        let userEntry = {
             username: 'Widya',
             count: 0,
             _id: generateId(),
@@ -33,7 +38,6 @@ describe('User Endpoints', () => {
         // checking the added username and get the id
         const firstEntry = await ActivityModel.find({ 'username': 'Widya' });
         expect(firstEntry[0]['username']).toEqual('Widya');
-
     });
 
     it('POST /users/:_id/exercises; Task: Create new exercises', async () => {
@@ -42,7 +46,7 @@ describe('User Endpoints', () => {
         const firstEntry = await ActivityModel.find({ 'username': 'Widya' });
         const testUserId = firstEntry[0]['_id'];
 
-        const exerciseEntries = [
+        let exerciseEntries = [
             {
                 description: 'Eat',
                 duration: 20,
@@ -87,15 +91,13 @@ describe('User Endpoints', () => {
 
 
 
-    // it('GET /api/deleteall; Task: Delete all documents', async () => {
-    //     const res = await requestWithSupertest.get('/api/deleteall');
-    //     expect(res.status).toEqual(200);
-    // });
+    it('GET /api/deleteall; Task: Delete all documents', async () => {
+        const res = await requestWithSupertest.get('/api/deleteall');
+        expect(res.status).toEqual(200);
+    });
 });
 
 afterAll(() => {
-    // const res = await requestWithSupertest.get('/api/deleteall');
-    // mongooseHandler.connection.db.dropCollection('backendfour', function (req, res) { });
     mongooseHandler.disconnect();
     serverlistener.close();
 });
