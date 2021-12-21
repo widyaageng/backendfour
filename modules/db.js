@@ -150,7 +150,6 @@ const queryExerciseRange = (urlQueries, done) => {
     ActivityModel.findById(urlQueries.userid, function (err, userdata) {
         if (err) return done(err);
 
-        console.log(userdata);
         docOut.username = userdata.username;
 
         if (urlQueries.limit === 'all') {
@@ -160,10 +159,10 @@ const queryExerciseRange = (urlQueries, done) => {
                     $gte: urlQueries.start,
                     $lte: urlQueries.end
                 }
-            }, {_id:0, 'userid':0, __v:0}, function (err, data) {
+            }, { _id: 0, 'userid': 0, __v: 0 }, callback = function (err, exdata) {
                 if (err) return done(err, null);
-                docOut.count = data.length;
-                docOut.log = data;
+                docOut.count = exdata.length;
+                docOut.log = exdata;
                 done(null, docOut);
             });
         } else {
@@ -173,12 +172,19 @@ const queryExerciseRange = (urlQueries, done) => {
                     $gte: urlQueries.start,
                     $lte: urlQueries.end
                 }
-            }, {_id:0, 'userid':0, __v:0}, function (err, data) {
+            }, {
+                _id: 0,
+                'userid': 0,
+                __v: 0,
+            }, {
+                limit: parseInt(urlQueries.limit)
+            }, callback = function (err, exdata) {
+                console.log(exdata);
                 if (err) return done(err, null);
-                docOut.count = urlQueries.limit;
-                docOut.log = data;
+                docOut.count = exdata.length;
+                docOut.log = exdata;
                 done(null, docOut);
-            });
+            })
         }
     })
 };
