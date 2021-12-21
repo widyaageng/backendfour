@@ -34,8 +34,8 @@ const activitySchema = new Schema({
 let ActivityModel = mongoose.model('Activity', activitySchema);
 let ExerciseModel = mongoose.model('Exercise', exerciseSchema);
 
-const logKeys = ['description', 'duration', 'date'];
-const typeValues = ['string', 'number', 'string'];
+const logKeys = [':_id', 'description', 'duration', 'date'];
+const typeValues = ['string', 'string', 'number', 'string'];
 // -------------------- End of Database setup --------------------
 
 // -------------------- Util function --------------------
@@ -50,6 +50,9 @@ const generateId = () => {
 };
 
 const checkActivityLog = (activityLog) => {
+    for (const [index, element] of Object.keys(activityLog).entries()) {
+        console.log(index, element, ", expected ", logKeys[index]);
+    }
     let keyFlag = Object.keys(activityLog).every((item) => logKeys.includes(item));
 
     if (keyFlag) {
