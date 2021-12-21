@@ -87,10 +87,10 @@ describe('User Endpoints', () => {
 
 
 
-    it('GET /api/deleteall; Task: Delete all documents', async () => {
-        const res = await requestWithSupertest.get('/api/deleteall');
-        expect(res.status).toEqual(200);
-    });
+    // it('GET /api/deleteall; Task: Delete all documents', async () => {
+    //     const res = await requestWithSupertest.get('/api/deleteall');
+    //     expect(res.status).toEqual(200);
+    // });
 });
 
 afterAll(() => {
