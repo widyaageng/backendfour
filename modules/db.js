@@ -50,9 +50,6 @@ const generateId = () => {
 };
 
 const checkActivityLog = (activityLog) => {
-    for (const [index, element] of Object.keys(activityLog).entries()) {
-        console.log(index, element, ", expected ", logKeys[index]);
-    }
     let keyFlag = Object.keys(activityLog).every((item) => logKeys.includes(item));
 
     if (keyFlag) {
@@ -191,7 +188,6 @@ const queryExerciseRange = (urlQueries, done) => {
             }, {
                 limit: parseInt(urlQueries.limit)
             }, callback = function (err, exdata) {
-                console.log(exdata);
                 if (err) return done(err, null);
                 docOut.count = exdata.length;
 
