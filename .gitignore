@@ -3,3 +3,7 @@ node_modules
 test.rest
 # Local Netlify folder
 .netlify
+app.yaml
+.gcloudignore
+.replit
+issue.txt

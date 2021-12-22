@@ -22,7 +22,7 @@ const exerciseSchema = new Schema({
     userid: String,
     duration: Number,
     date: String
-})
+});
 
 const activitySchema = new Schema({
     username: String,
@@ -34,8 +34,8 @@ const activitySchema = new Schema({
 let ActivityModel = mongoose.model('Activity', activitySchema);
 let ExerciseModel = mongoose.model('Exercise', exerciseSchema);
 
-const logKeys = ['description', 'duration', 'date'];
-const typeValues = ['string', 'number', 'string'];
+const logKeys = [':_id','description', 'duration', 'date'];
+const typeValues = ['string', 'string', 'number', 'string'];
 // -------------------- End of Database setup --------------------
 
 // -------------------- Util function --------------------
@@ -91,6 +91,18 @@ const createUser = (user, done) => {
         if (err) return done(err, null);
         done(null, data);
     })
+};
+
+// AllUser : function(username, callback)
+const getAllUsers = (done) => {
+    ActivityModel.find({}, {
+        count:0,
+        log:0,
+        __v:0
+    }, function (err, allusers) {
+        if (err) return done(err, null);
+        done(null, allusers);
+    });
 };
 
 // Add activity: function(userid, activity object, callback)
@@ -234,3 +246,4 @@ exports.addActivityArray = addActivityArray;
 exports.queryExerciseRange = queryExerciseRange;
 exports.deleteActivityPromise = deleteActivityPromise;
 exports.deleteExcercisePromise = deleteExcercisePromise;
+exports.getAllUsers = getAllUsers;

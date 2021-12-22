@@ -1,2 +1,3 @@
-1. restructure Models (activity, exercise)
-2. point(1) require two functions to delete both models in api /deleteAll
+1. ET request to /api/users to get a list of all users.
+2. The GET request to /api/users returns an array.
+3. Each element in the array returned from GET /api/users is an object literal containing a user's username and _id.

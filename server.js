@@ -95,6 +95,21 @@ routerapi.get(/\/users\/([0-9abcdef]{24})\/logs\?*(from)*/, function(req, res, n
   });
 });
 
+// /api/users get all users
+const getUsers = require("./modules/db").getAllUsers;
+routerapi.get('/users', function (req, res, next) {
+  let t = setTimeout(() => {
+    next({ message: "timeout" });
+  }, TIMEOUT);
+
+  getUsers(function(err, data) {
+    if (err) return next(err);
+    res.json(data);
+    next();
+  })
+});
+
+
 // /api/deleteAll to clean existing database
 const deleteAllActivity = require("./modules/db").deleteActivityPromise;
 const deleteAllExercise = require("./modules/db").deleteExcercisePromise;
