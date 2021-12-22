@@ -165,16 +165,7 @@ const queryExerciseRange = (urlQueries, done) => {
             }, { _id: 0, 'userid': 0, __v: 0 }, callback = function (err, exdata) {
                 if (err) return done(err, null);
                 docOut.count = exdata.length;
-                
-                let tempDate = null;
-                let formattedData = exdata.map(item => {
-                    tempDate = new Date(item['date']);
-                    tempDate = tempDate.toUTCString().split(' ').slice(0, 4);
-                    item['date'] = `${tempDate[0].slice(0, -1)} ${tempDate[2]} ${tempDate[1]} ${tempDate[3]}`;
-                    return item;
-                });
-
-                docOut.log = formattedData;
+                docOut.log = exdata;
                 done(null, docOut);
             });
         } else {
@@ -194,16 +185,7 @@ const queryExerciseRange = (urlQueries, done) => {
                 console.log(exdata);
                 if (err) return done(err, null);
                 docOut.count = exdata.length;
-
-                let tempDate = null;
-                let formattedData = exdata.map(item => {
-                    tempDate = new Date(item['date']);
-                    tempDate = tempDate.toUTCString().split(' ').slice(0, 4);
-                    item['date'] = `${tempDate[0].slice(0, -1)} ${tempDate[2]} ${tempDate[1]} ${tempDate[3]}`;
-                    return item;
-                });
-
-                docOut.log = formattedData;
+                docOut.log = exdata;
                 done(null, docOut);
             })
         }

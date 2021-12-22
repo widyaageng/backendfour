@@ -13,6 +13,7 @@ describe('User Endpoints', () => {
 });
 
 afterAll(() => {
+    // mongooseHandler.connection.db.dropCollection('backendfour', function(req, res) {});
     mongooseHandler.disconnect();
     serverlistener.close();
 });
