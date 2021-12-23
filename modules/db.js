@@ -1,21 +1,22 @@
 require('dotenv').config();
 
 // -------------------- Database setup --------------------
-var mongoose = require('mongoose');
+var mongooseHandler = require('mongoose');
 const uri = process.env.MONGO_URI;
 
-mongoose.connect(uri, {
-    useUnifiedTopology: true,
-    useNewUrlParser: true
-});
-
-// mongoose.connect("mongodb://localhost:27017/backendfour", {
+// mongooseHandler.connect("mongodb://localhost:27017/backendfour", {
 //     useUnifiedTopology: true,
 //     useNewUrlParser: true
 // });
+(async function () {
+    await mongooseHandler.connect(uri, {
+        useUnifiedTopology: true,
+        useNewUrlParser: true
+    }).then(console.log("Database connected!"));
+})();
 
 
-const { Schema } = mongoose;
+const { Schema } = mongooseHandler;
 
 const exerciseSchema = new Schema({
     description: String,
@@ -31,8 +32,8 @@ const activitySchema = new Schema({
     log: [exerciseSchema]
 });
 
-let ActivityModel = mongoose.model('Activity', activitySchema);
-let ExerciseModel = mongoose.model('Exercise', exerciseSchema);
+let ActivityModel = mongooseHandler.model('Activity', activitySchema);
+let ExerciseModel = mongooseHandler.model('Exercise', exerciseSchema);
 
 const logKeys = [':_id', 'description', 'duration', 'date'];
 const typeValues = ['string', 'string', 'number', 'string'];
@@ -63,7 +64,7 @@ const checkActivityLog = (activityLog) => {
 
         let valueFlag = Object.values(activityLog).map((element, index) => {
             if ((index == Object.values(activityLog).length - 1)
-            && (element === null || !element.match(/\d{4}-\d{2}-\d{2}/))) {
+                && (element === null || !String(element).match(/\d{4}-\d{2}-\d{2}/))) {
                 activityLog.date = (new Date()).toISOString().split('T')[0];
                 return true;
             }
@@ -103,9 +104,9 @@ const createUser = (user, done) => {
 // AllUser : function(username, callback)
 const getAllUsers = (done) => {
     ActivityModel.find({}, {
-        count:0,
-        log:0,
-        __v:0
+        count: 0,
+        log: 0,
+        __v: 0
     }, function (err, allusers) {
         if (err) return done(err, null);
         done(null, allusers);
@@ -181,7 +182,7 @@ const queryExerciseRange = (urlQueries, done) => {
             }, { _id: 0, 'userid': 0, __v: 0 }, callback = function (err, exdata) {
                 if (err) return done(err, null);
                 docOut.count = exdata.length;
-                
+
                 let tempDate = null;
                 let formattedData = exdata.map(item => {
                     tempDate = new Date(item['date']);
@@ -244,7 +245,7 @@ const deleteExcercisePromise = (done) => {
 //-------------------- End of Database function --------------------
 
 // -------------------- exports --------------------------------
-exports.mongoose = mongoose;
+exports.mongooseHandler = mongooseHandler;
 exports.ActivityModel = ActivityModel;
 exports.ExerciseModel = ExerciseModel;
 exports.generateId = generateId;

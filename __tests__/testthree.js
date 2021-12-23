@@ -1,11 +1,11 @@
 const server = require('../server.js').app;
 const serverlistener = require('../server.js').listener;
-const mongooseHandler = require('../modules/db.js').mongoose;
-const ActivityModel = require('../modules/db.js').ActivityModel;
-const ExerciseModel = require('../modules/db.js').ExerciseModel;
 const generateId = require('../modules/db').generateId;
 const supertest = require('supertest');
-const requestWithSupertest = supertest(server);
+const requestWithSupertest = supertest(serverlistener);
+const mongooseHandler = require('../modules/db.js').mongooseHandler;
+const ActivityModel = require('../modules/db.js').ActivityModel;
+const ExerciseModel = require('../modules/db.js').ExerciseModel;
 
 // -------------------- util function --------------------
 
@@ -91,7 +91,7 @@ describe('User Endpoints', () => {
         reformattedDate = reformattedDate.toUTCString().split(' ').slice(0, 4);
         //Reformat to be Www Mmm dd yyyy
         let formattedStringDate = `${reformattedDate[0].slice(0, -1)} ${reformattedDate[2]} ${reformattedDate[1]} ${reformattedDate[3]}`;
-        
+
         for (const entry of exerciseEntries) {
             resSupertest = await requestWithSupertest.post(`/api/users/${userIdEntry}/exercises`)
                 .send(entry);
@@ -111,7 +111,7 @@ describe('User Endpoints', () => {
         const res = await requestWithSupertest.get(`/api/users/${testUserId}/logs?from=&to=&limit=1`);
 
         // checking format return
-        let reformattedDate = new Date(exerciseEntries.slice(0,1)[0]['date']);
+        let reformattedDate = new Date(exerciseEntries.slice(0, 1)[0]['date']);
         //This will generate ['Www', 'dd', 'Mmm', 'yyyy'] array
         reformattedDate = reformattedDate.toUTCString().split(' ').slice(0, 4);
         //Reformat to be Www Mmm dd yyyy
@@ -130,7 +130,12 @@ describe('User Endpoints', () => {
     });
 });
 
-afterAll(() => {
-    mongooseHandler.disconnect();
-    serverlistener.close();
+afterAll(async() => {
+    await mongooseHandler.disconnect().then(console.log("Database disconnected!"));
+    try {
+        serverlistener.close();
+        console.log("App closed!");
+    } catch (error) {
+        console.log(error);
+    }
 });

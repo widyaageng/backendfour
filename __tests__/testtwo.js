@@ -1,11 +1,11 @@
 const server = require('../server.js').app;
 const serverlistener = require('../server.js').listener;
-const mongooseHandler = require('../modules/db.js').mongoose;
-const ActivityModel = require('../modules/db.js').ActivityModel;
-const ExerciseModel = require('../modules/db.js').ExerciseModel;
 const generateId = require('../modules/db').generateId;
 const supertest = require('supertest');
-const requestWithSupertest = supertest(server);
+const requestWithSupertest = supertest(serverlistener);
+const mongooseHandler = require('../modules/db.js').mongooseHandler;
+const ActivityModel = require('../modules/db.js').ActivityModel;
+const ExerciseModel = require('../modules/db.js').ExerciseModel;
 
 // -------------------- util function --------------------
 
@@ -97,7 +97,12 @@ describe('User Endpoints', () => {
     });
 });
 
-afterAll(() => {
-    mongooseHandler.disconnect();
-    serverlistener.close();
+afterAll(async() => {
+    await mongooseHandler.disconnect().then(console.log("Database disconnected!"));
+    try {
+        serverlistener.close();
+        console.log("App closed!");
+    } catch (error) {
+        console.log(error);
+    }
 });
