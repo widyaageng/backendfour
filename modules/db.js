@@ -4,15 +4,15 @@ require('dotenv').config();
 var mongoose = require('mongoose');
 const uri = process.env.MONGO_URI;
 
-mongoose.connect(uri, {
-    useUnifiedTopology: true,
-    useNewUrlParser: true
-});
-
-// mongoose.connect("mongodb://localhost:27017/backendfour", {
+// mongoose.connect(uri, {
 //     useUnifiedTopology: true,
 //     useNewUrlParser: true
 // });
+
+mongoose.connect("mongodb://localhost:27017/backendfour", {
+    useUnifiedTopology: true,
+    useNewUrlParser: true
+});
 
 
 const { Schema } = mongoose;
@@ -34,7 +34,7 @@ const activitySchema = new Schema({
 let ActivityModel = mongoose.model('Activity', activitySchema);
 let ExerciseModel = mongoose.model('Exercise', exerciseSchema);
 
-const logKeys = [':_id','description', 'duration', 'date'];
+const logKeys = [':_id', 'description', 'duration', 'date'];
 const typeValues = ['string', 'string', 'number', 'string'];
 // -------------------- End of Database setup --------------------
 
@@ -50,7 +50,9 @@ const generateId = () => {
 };
 
 const checkActivityLog = (activityLog) => {
-    let keyFlag = Object.keys(activityLog).every((item) => logKeys.includes(item));
+    let keyFlag = Object.keys(activityLog).every((item) => {
+        return logKeys.includes(item);
+    });
 
     if (keyFlag) {
         try {
@@ -59,7 +61,12 @@ const checkActivityLog = (activityLog) => {
             throw new Error('activityLog value duration is not valid number');
         }
 
-        let valueFlag = Object.values(activityLog).every((element, index) => {
+        let valueFlag = Object.values(activityLog).map((element, index) => {
+            if ((index == Object.values(activityLog).length - 1)
+            && (element === null || !element.match(/\d{4}-\d{2}-\d{2}/))) {
+                activityLog.date = (new Date()).toISOString().split('T')[0];
+                return true;
+            }
             return typeValues[index] === typeof element;
         });
 

@@ -62,7 +62,7 @@ routerapi.post('/users/:_id/exercises', function (req, res, next) {
   let t = setTimeout(() => {
     next({ message: "timeout" });
   }, TIMEOUT);
-
+  console.log(req.body);
   addActivity(req.params['_id'], req.body, function (err, data) {
     clearTimeout(t);
     if (err) return next(err);
@@ -116,8 +116,8 @@ const deleteAllExercise = require("./modules/db").deleteExcercisePromise;
 routerapi.get('/deleteall', function (req, res, next) {
 
   var deletedRecords = {
-    deletedUserCount: 0,
-    deletedActivityCount: 0
+    nowUserCount: 0,
+    nowActivityCount: 0
   };
 
   let t = setTimeout(() => {
